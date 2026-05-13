@@ -163,12 +163,12 @@ const SECTIONS = [
   {
     id:1, key:'LGO', title:'Logiciel métier LGO',
     questions:[
-      {id:'LGO-1', text:'Comptes partagés / mot de passe générique pour le LGO ?', risk:'critique', ref:'Art. 32 RGPD', rec:'Créer des comptes nominatifs individuels dans le LGO. Supprimer les mots de passe génériques.'},
-      {id:'LGO-2', text:'Préparateurs ont le même niveau d\'accès que le titulaire ?', risk:'sensible', ref:'Art. 5(1)f RGPD', rec:null},
+      {id:'LGO-1', text:'Comptes partagés / mot de passe générique pour le LGO ?', risk:'critique', ref:'Art. 32 RGPD', rec:'Créer des comptes nominatifs individuels dans le LGO. Supprimer les mots de passe génériques.',neg:true},
+      {id:'LGO-2', text:'Préparateurs ont le même niveau d\'accès que le titulaire ?', risk:'sensible', ref:'Art. 5(1)f RGPD', rec:null,neg:true},
       {id:'LGO-3', text:'Exports de données patients tracés et contrôlés ?', risk:'critique', ref:'Art. 32 RGPD', rec:'Activer la journalisation des exports dans le LGO. Restreindre les droits d\'export au seul titulaire.'},
       {id:'LGO-4', text:'Sauvegardes localisées et accès contrôlé ?', risk:'sensible', ref:'Art. 32 RGPD', rec:null},
       {id:'LGO-5', text:'Contrat Art. 28 signé avec l\'éditeur LGO ?', risk:'critique', ref:'Art. 28 RGPD', rec:'Signer un avenant RGPD Art. 28 avec l\'éditeur du LGO. Modèle disponible sur cnil.fr.'},
-      {id:'LGO-6', text:'Remplaçants utilisent l\'identifiant du titulaire ?', risk:'sensible', ref:'Art. 32 RGPD', rec:null},
+      {id:'LGO-6', text:'Remplaçants utilisent l\'identifiant du titulaire ?', risk:'sensible', ref:'Art. 32 RGPD', rec:null,neg:true},
       {id:'LGO-7', text:'LGO hébergé chez un prestataire certifié HDS en Europe ?', risk:'critique', ref:'Décret 2026-209', rec:'Vérifier la certification HDS de l\'hébergeur du LGO. Demander attestation écrite à l\'éditeur.'},
       {id:'LGO-8', text:'Mise à jour régulière du LGO (correctifs sécurité) ?', risk:'sensible', ref:'Art. 32 RGPD', rec:null},
       {id:'LGO-9', text:'Accès distant au LGO sécurisé (VPN, double authentification) ?', risk:'sensible', ref:'Art. 32 RGPD', rec:null},
@@ -178,21 +178,21 @@ const SECTIONS = [
   {
     id:2, key:'COM', title:'Communications',
     questions:[
-      {id:'COM-1', text:'Ordonnances/données patients envoyées par Gmail/Outlook classique ?', risk:'critique', ref:'Art. 9 RGPD', rec:'Interdire l\'envoi d\'ordonnances par email classique. Adopter MSSanté ou Apicrypt.'},
-      {id:'COM-2', text:'WhatsApp/SMS utilisés pour échanger des infos patients ?', risk:'critique', ref:'Art. 9 RGPD', rec:'Interdire WhatsApp et SMS pour les échanges patients. Formaliser par note interne.'},
-      {id:'COM-3', text:'Téléphones personnels utilisés pour échanges professionnels ?', risk:'sensible', ref:'Art. 32 RGPD', rec:null},
-      {id:'COM-4', text:'Boîte email personnelle utilisée pour communications pro ?', risk:'sensible', ref:'Art. 32 RGPD', rec:null},
+      {id:'COM-1', text:'Ordonnances/données patients envoyées par Gmail/Outlook classique ?', risk:'critique', ref:'Art. 9 RGPD', rec:'Interdire l\'envoi d\'ordonnances par email classique. Adopter MSSanté ou Apicrypt.',neg:true},
+      {id:'COM-2', text:'WhatsApp/SMS utilisés pour échanger des infos patients ?', risk:'critique', ref:'Art. 9 RGPD', rec:'Interdire WhatsApp et SMS pour les échanges patients. Formaliser par note interne.',neg:true},
+      {id:'COM-3', text:'Téléphones personnels utilisés pour échanges professionnels ?', risk:'sensible', ref:'Art. 32 RGPD', rec:null,neg:true},
+      {id:'COM-4', text:'Boîte email personnelle utilisée pour communications pro ?', risk:'sensible', ref:'Art. 32 RGPD', rec:null,neg:true},
       {id:'COM-5', text:'Messagerie sécurisée MSSanté / Apicrypt utilisée ?', risk:'acceptable', ref:'ANS MSSanté', rec:null},
-      {id:'COM-6', text:'Fax encore utilisé pour envoi d\'ordonnances ?', risk:'sensible', ref:'Art. 32 RGPD', rec:null},
+      {id:'COM-6', text:'Fax encore utilisé pour envoi d\'ordonnances ?', risk:'sensible', ref:'Art. 32 RGPD', rec:null,neg:true},
       {id:'COM-7', text:'Politique écrite sur les canaux de communication autorisés ?', risk:'sensible', ref:'Art. 32 RGPD', rec:null},
     ]
   },
   {
     id:3, key:'EXT', title:'Relations externes / Sous-traitants',
     questions:[
-      {id:'EXT-1', text:'Bulletins de salaire/RIB envoyés au comptable par email non sécurisé ?', risk:'sensible', ref:'Art. 28 RGPD', rec:null},
-      {id:'EXT-2', text:'Mutuelles demandent copies de factures par fax/email ?', risk:'sensible', ref:'Art. 28 RGPD', rec:null},
-      {id:'EXT-3', text:'Prestataires ménage/alarme ont accès aux zones avec données visibles ?', risk:'acceptable', ref:'Art. 32 RGPD', rec:null},
+      {id:'EXT-1', text:'Bulletins de salaire/RIB envoyés au comptable par email non sécurisé ?', risk:'sensible', ref:'Art. 28 RGPD', rec:null,neg:true},
+      {id:'EXT-2', text:'Mutuelles demandent copies de factures par fax/email ?', risk:'sensible', ref:'Art. 28 RGPD', rec:null,neg:true},
+      {id:'EXT-3', text:'Prestataires ménage/alarme ont accès aux zones avec données visibles ?', risk:'acceptable', ref:'Art. 32 RGPD', rec:null,neg:true},
       {id:'EXT-4', text:'Liste à jour de tous les prestataires ayant accès aux données ?', risk:'critique', ref:'Art. 28 RGPD', rec:'Dresser la liste exhaustive des prestataires ayant accès aux données. Mettre à jour trimestriellement.'},
       {id:'EXT-5', text:'Contrats article 28 signés avec tous les prestataires clés ?', risk:'critique', ref:'Art. 28 RGPD', rec:'Signer des contrats Art. 28 avec chaque prestataire clé. Modèles disponibles sur cnil.fr.'},
       {id:'EXT-6', text:'Prestataires informatiques (maintenance) avec contrat Art. 28 ?', risk:'critique', ref:'Art. 28 RGPD', rec:'Régulariser le contrat Art. 28 avec le prestataire de maintenance informatique.'},
@@ -204,10 +204,10 @@ const SECTIONS = [
   {
     id:4, key:'RH', title:'RH & Salaires',
     questions:[
-      {id:'RH-1', text:'Bulletins de salaire accessibles à tous les collaborateurs ?', risk:'sensible', ref:'Art. 5(1)f RGPD', rec:null},
-      {id:'RH-2', text:'Dossiers salariés accessibles à plusieurs personnes sans justification ?', risk:'sensible', ref:'Art. 5(1)f RGPD', rec:null},
-      {id:'RH-3', text:'Données RH envoyées au cabinet comptable via canal non sécurisé ?', risk:'sensible', ref:'Art. 28 RGPD', rec:null},
-      {id:'RH-4', text:'Dossiers candidats non retenus conservés plus de 2 ans ?', risk:'acceptable', ref:'Art. 5(1)e RGPD', rec:null},
+      {id:'RH-1', text:'Bulletins de salaire accessibles à tous les collaborateurs ?', risk:'sensible', ref:'Art. 5(1)f RGPD', rec:null,neg:true},
+      {id:'RH-2', text:'Dossiers salariés accessibles à plusieurs personnes sans justification ?', risk:'sensible', ref:'Art. 5(1)f RGPD', rec:null,neg:true},
+      {id:'RH-3', text:'Données RH envoyées au cabinet comptable via canal non sécurisé ?', risk:'sensible', ref:'Art. 28 RGPD', rec:null,neg:true},
+      {id:'RH-4', text:'Dossiers candidats non retenus conservés plus de 2 ans ?', risk:'acceptable', ref:'Art. 5(1)e RGPD', rec:null,neg:true},
       {id:'RH-5', text:'Employés informés du traitement de leurs données personnelles ?', risk:'critique', ref:'Art. 13 RGPD', rec:'Remettre à chaque employé une notice d\'information sur le traitement de ses données.'},
       {id:'RH-6', text:'Vidéosurveillance — salariés informés, déclaration CNIL faite ?', risk:'critique', ref:'Art. 13 RGPD', rec:'Informer les salariés de la vidéosurveillance. Vérifier la conformité de l\'affichage obligatoire.'},
       {id:'RH-7', text:'Données de santé des salariés stockées séparément ?', risk:'critique', ref:'Art. 9 RGPD', rec:'Stocker les données de santé salariés dans un dossier séparé à accès restreint.'},
@@ -217,7 +217,7 @@ const SECTIONS = [
     id:5, key:'WEB', title:'Site web & présence digitale',
     questions:[
       {id:'WEB-1', text:'Site web avec formulaire de contact — politique de confidentialité affichée ?', risk:'critique', ref:'Art. 13 RGPD', rec:'Ajouter une politique de confidentialité conforme RGPD sur le site. Lier depuis chaque formulaire.'},
-      {id:'WEB-2', text:'Cookies analytiques/marketing utilisés sans consentement explicite ?', risk:'critique', ref:'Directive ePrivacy', rec:'Installer un bandeau cookies conforme avec recueil de consentement préalable.'},
+      {id:'WEB-2', text:'Cookies analytiques/marketing utilisés sans consentement explicite ?', risk:'critique', ref:'Directive ePrivacy', rec:'Installer un bandeau cookies conforme avec recueil de consentement préalable.',neg:true},
       {id:'WEB-3', text:'Prise de RDV en ligne — prestataire avec contrat Art. 28 ?', risk:'critique', ref:'Art. 28 RGPD', rec:'Signer un contrat Art. 28 avec la plateforme de prise de RDV en ligne.'},
       {id:'WEB-4', text:'Avis patients en ligne — données collectées avec base légale ?', risk:'sensible', ref:'Art. 6 RGPD', rec:null},
       {id:'WEB-5', text:'Hébergeur du site web localisé en Europe ?', risk:'sensible', ref:'Décret 2026-209', rec:null},
@@ -250,7 +250,7 @@ const SECTIONS = [
   {
     id:8, key:'SEC', title:'Cybersécurité physique & organisationnelle',
     questions:[
-      {id:'SEC-1', text:'Écrans visibles par le public depuis le comptoir ?', risk:'critique', ref:'Art. 32 RGPD', rec:'Installer des filtres de confidentialité sur les écrans visibles du public.'},
+      {id:'SEC-1', text:'Écrans visibles par le public depuis le comptoir ?', risk:'critique', ref:'Art. 32 RGPD', rec:'Installer des filtres de confidentialité sur les écrans visibles du public.',neg:true},
       {id:'SEC-2', text:'Poste informatique verrouillé automatiquement en cas d\'inactivité ?', risk:'critique', ref:'Art. 32 RGPD', rec:'Configurer le verrouillage automatique des postes après 5 minutes d\'inactivité.'},
       {id:'SEC-3', text:'Ordonnances papier archivées dans espace sécurisé et verrouillé ?', risk:'sensible', ref:'Art. 32 RGPD', rec:null},
       {id:'SEC-4', text:'Destruction sécurisée des documents patients (broyeur) ?', risk:'sensible', ref:'Art. 5(1)e RGPD', rec:null},
@@ -318,6 +318,11 @@ let ST = {
 // ─── HELPERS ──────────────────────────────────────────────────────────────────
 
 function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+function findQ(qid){
+  for(const s of SECTIONS){const q=s.questions.find(q=>q.id===qid);if(q)return q;}
+  return null;
+}
 
 function getSections(){
   return SECTIONS.filter(s => !s.conditionalCA || (ST.pharmacy && ST.pharmacy.ca === 'high'));
@@ -425,12 +430,6 @@ function rBadge(risk){
   return `<span class="rbadge rb-${risk}">${m[risk]||risk}</span>`;
 }
 
-function aClass(qid,ans){
-  const a=ST.answers[qid];
-  if(!a||a.answer!==ans) return '';
-  return ' sel-'+ans;
-}
-
 function qCardCls(qid){
   const a=ST.answers[qid];
   if(!a||!a.answer) return 'q-card';
@@ -438,7 +437,30 @@ function qCardCls(qid){
 }
 
 function renderQCard(q){
-  const note=(ST.answers[q.id]&&ST.answers[q.id].note)||'';
+  const a=ST.answers[q.id];
+  const raw=a?(a.raw||null):null;
+  const comp=a?a.answer:null;
+  const note=(a&&a.note)||'';
+
+  let btns;
+  if(q.neg){
+    // Question à polarité négative : Oui = risque/NC, Non = conforme
+    btns=`<button class="a-btn${raw==='non'?' sel-conforme':''}" onclick="setAns('${q.id}','non')">✅ Non</button>`
+        +`<button class="a-btn${raw==='partiellement'?' sel-partiel':''}" onclick="setAns('${q.id}','partiellement')">⚠️ Partiellement</button>`
+        +`<button class="a-btn${raw==='oui'?' sel-non-conforme':''}" onclick="setAns('${q.id}','oui')">❌ Oui</button>`
+        +`<button class="a-btn${raw==='nc'?' sel-na':''}" onclick="setAns('${q.id}','nc')">— Non concerné</button>`;
+  } else {
+    // Question à polarité positive : Oui = conforme, Non = NC
+    btns=`<button class="a-btn${raw==='oui'?' sel-conforme':''}" onclick="setAns('${q.id}','oui')">✅ Oui</button>`
+        +`<button class="a-btn${raw==='partiellement'?' sel-partiel':''}" onclick="setAns('${q.id}','partiellement')">⚠️ Partiellement</button>`
+        +`<button class="a-btn${raw==='non'?' sel-non-conforme':''}" onclick="setAns('${q.id}','non')">❌ Non</button>`
+        +`<button class="a-btn${raw==='nc'?' sel-na':''}" onclick="setAns('${q.id}','nc')">— Non concerné</button>`;
+  }
+
+  const compTag=comp&&comp!=='na'
+    ?`<span class="comp-tag" style="font-size:11px;margin-left:8px;color:${comp==='conforme'?'var(--green)':comp==='partiel'?'var(--yellow)':'var(--red)'}">→ ${comp==='conforme'?'Conforme':comp==='partiel'?'Partiel':'Non conforme'}</span>`
+    :'';
+
   return `<div class="${qCardCls(q.id)}" id="qc-${q.id}">
   <div class="q-top">
     <span class="q-id">${q.id}</span>
@@ -446,12 +468,7 @@ function renderQCard(q){
     ${rBadge(q.risk)}
   </div>
   <div class="q-ref">📋 ${esc(q.ref)}</div>
-  <div class="ans-row">
-    <button class="a-btn${aClass(q.id,'conforme')}" onclick="setAns('${q.id}','conforme')">✅ Conforme</button>
-    <button class="a-btn${aClass(q.id,'partiel')}" onclick="setAns('${q.id}','partiel')">⚠️ Partiel</button>
-    <button class="a-btn${aClass(q.id,'non-conforme')}" onclick="setAns('${q.id}','non-conforme')">❌ Non conforme</button>
-    <button class="a-btn${aClass(q.id,'na')}" onclick="setAns('${q.id}','na')">— N/A</button>
-  </div>
+  <div class="ans-row">${btns}${compTag}</div>
   <textarea class="q-note-area" placeholder="Note / Observation (facultatif)" oninput="setNote('${q.id}',this.value)">${esc(note)}</textarea>
 </div>`;
 }
@@ -700,19 +717,38 @@ function renderSummary(){
 
 // ─── ACTIONS ──────────────────────────────────────────────────────────────────
 
-function setAns(qid, ans){
+function setAns(qid, raw){
+  const q=findQ(qid);
+  let comp;
+  if(raw==='nc') comp='na';
+  else if(q&&q.neg){
+    comp=raw==='non'?'conforme':raw==='partiellement'?'partiel':'non-conforme';
+  } else {
+    comp=raw==='oui'?'conforme':raw==='partiellement'?'partiel':'non-conforme';
+  }
   if(!ST.answers[qid]) ST.answers[qid]={};
-  ST.answers[qid].answer=ans;
+  ST.answers[qid].raw=raw;
+  ST.answers[qid].answer=comp;
   saveState();
   // Patch card without full re-render
   const card=document.getElementById('qc-'+qid);
   if(card){
-    card.className='q-card ans-'+ans;
+    card.className='q-card ans-'+comp;
     card.querySelectorAll('.a-btn').forEach(b=>b.className='a-btn');
-    const idx={'conforme':0,'partiel':1,'non-conforme':2,'na':3}[ans];
-    if(idx!==undefined){
-      const btns=card.querySelectorAll('.a-btn');
-      if(btns[idx]) btns[idx].className='a-btn sel-'+ans;
+    const btns=card.querySelectorAll('.a-btn');
+    const idx=q&&q.neg?{non:0,partiellement:1,oui:2,nc:3}[raw]:{oui:0,partiellement:1,non:2,nc:3}[raw];
+    const selCls=comp==='conforme'?'sel-conforme':comp==='partiel'?'sel-partiel':comp==='non-conforme'?'sel-non-conforme':'sel-na';
+    if(idx!==undefined&&btns[idx]) btns[idx].className='a-btn '+selCls;
+    // Update compliance tag
+    const row=card.querySelector('.ans-row');
+    if(row){
+      let tag=row.querySelector('.comp-tag');
+      if(comp==='na'){if(tag)tag.remove();}
+      else {
+        if(!tag){tag=document.createElement('span');tag.className='comp-tag';row.appendChild(tag);}
+        tag.style.cssText='font-size:11px;margin-left:8px;color:'+(comp==='conforme'?'var(--green)':comp==='partiel'?'var(--yellow)':'var(--red)');
+        tag.textContent='→ '+(comp==='conforme'?'Conforme':comp==='partiel'?'Partiel':'Non conforme');
+      }
     }
   }
   updateScoreBadge();
@@ -994,7 +1030,8 @@ function generatePDF(){
       doc.setTextColor(...rColor); doc.text(rLabel,M+CW-2,y+5,{align:'right'});
 
       // Answer
-      const aLabel=a.answer==='conforme'?'✓ Conforme':a.answer==='partiel'?'~ Partiel':a.answer==='non-conforme'?'✗ Non conf.':'N/A';
+      const rawLabel=a.raw||a.answer;
+      const aLabel=rawLabel==='oui'?'Oui':rawLabel==='non'?'Non':rawLabel==='partiellement'?'Partiel':rawLabel==='nc'?'N/C':rawLabel==='conforme'?'Oui':rawLabel==='non-conforme'?'Non':'N/A';
       doc.setTextColor(...barColor);
       const aLW=doc.getTextWidth(aLabel)+doc.getTextWidth(rLabel)+6;
       doc.text(aLabel,M+CW-2-doc.getTextWidth(rLabel)-5,y+5,{align:'right'});
