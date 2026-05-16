@@ -35,13 +35,12 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
-import { ArrowLeft, Shield, Users, Loader2, ShieldCheck, User, FileText, Trash2, Crown, Activity, BarChart3, Building2, Search, UserCheck, Eye, ScrollText } from 'lucide-react';
+import { ArrowLeft, Shield, Users, Loader2, ShieldCheck, User, FileText, Trash2, Crown, Activity, BarChart3, Building2, Search, Eye, ScrollText } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { LoggingPolicyDocumentation } from '@/components/LoggingPolicyDocumentation';
 import { AdminActivityLog } from '@/components/AdminActivityLog';
 import { AdminAnonymizedDashboard } from '@/components/AdminAnonymizedDashboard';
 import { AdminOrganisationsPanel } from '@/components/AdminOrganisationsPanel';
-import { AdminClientsPanel } from '@/components/AdminClientsPanel';
 import { CreateUserDialog } from '@/components/CreateUserDialog';
 import { AdminSecurityMonitoring } from '@/components/AdminSecurityMonitoring';
 import { AuditLogsViewer } from '@/components/AuditLogsViewer';
@@ -199,10 +198,6 @@ const Admin = () => {
               <Users className="h-4 w-4" />
               Utilisateurs
             </TabsTrigger>
-            <TabsTrigger value="clients" className="gap-2">
-              <UserCheck className="h-4 w-4" />
-              Clients
-            </TabsTrigger>
             <TabsTrigger value="activity" className="gap-2">
               <Activity className="h-4 w-4" />
               Journal d'activité
@@ -227,10 +222,6 @@ const Admin = () => {
 
           <TabsContent value="organisations">
             <AdminOrganisationsPanel organisations={organisations} loading={orgsLoading} />
-          </TabsContent>
-
-          <TabsContent value="clients">
-            <AdminClientsPanel />
           </TabsContent>
 
           <TabsContent value="users" className="space-y-8">
