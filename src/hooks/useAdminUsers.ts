@@ -91,7 +91,6 @@ export const useAdminUsers = () => {
         super_admin: 'Super Admin',
         admin: 'Administrateur',
         user: 'Utilisateur',
-        client: 'Client',
       };
 
       toast({
