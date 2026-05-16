@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Organisation, SECTOR_LABELS, SIZE_LABELS, DPO_ROLE_LABELS, LEGAL_FRAMEWORK_LABELS } from '@/types/rgpd';
+import { Organisation, SECTOR_LABELS, SIZE_LABELS, DPO_ROLE_LABELS } from '@/types/rgpd';
 import { QuestionAnswer } from '@/types/conditionalQuestionnaire';
 import { ConditionalQuestionnaire } from './ConditionalQuestionnaire';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -165,7 +165,6 @@ export function QuestionnaireTab({ organisation, onAuditCompleted, restartTrigge
                 </DialogHeader>
                 <ConditionalQuestionnaire
                   sector={organisation.sector}
-                  legalFramework={organisation.legalFramework}
                   organisationId={organisation.id}
                   initialAnswers={savedAnswers}
                   onSave={handleSave}
