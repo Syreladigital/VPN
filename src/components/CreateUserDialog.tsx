@@ -75,9 +75,7 @@ export const CreateUserDialog = ({
     // Validation
     try {
       emailSchema.parse(email);
-      if (role !== 'client') {
-        passwordSchema.parse(password);
-      }
+      passwordSchema.parse(password);
       nameSchema.parse(firstName);
       nameSchema.parse(lastName);
     } catch (error) {
@@ -146,7 +144,7 @@ export const CreateUserDialog = ({
 
   const getAvailableRoles = (): AppRole[] => {
     if (isSuperAdmin) {
-      return ['user', 'admin', 'super_admin', 'client'];
+      return ['user', 'admin', 'super_admin'];
     }
     return ['user', 'admin'];
   };
@@ -165,9 +163,7 @@ export const CreateUserDialog = ({
         <DialogHeader>
           <DialogTitle>Créer un nouvel utilisateur</DialogTitle>
           <DialogDescription>
-            {role === 'client' 
-              ? 'Créez un compte client. Le client recevra un lien par email pour définir son mot de passe et accéder au portail client en lecture seule.'
-              : 'Créez un compte collaborateur (consultant/DPO). Il recevra ses identifiants pour se connecter et gérer les organismes.'}
+            Créez un compte collaborateur (consultant/DPO). Il recevra ses identifiants pour se connecter et gérer les organismes.
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -223,15 +219,13 @@ export const CreateUserDialog = ({
                     {r === 'super_admin' && 'Super Admin'}
                     {r === 'admin' && 'Administrateur'}
                     {r === 'user' && 'Utilisateur (Consultant)'}
-                    {r === 'client' && 'Client'}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
           </div>
 
-          {role !== 'client' && (
-            <div className="space-y-2">
+          <div className="space-y-2">
               <Label htmlFor="create-password">Mot de passe temporaire *</Label>
               <Input
                 id="create-password"
@@ -246,10 +240,8 @@ export const CreateUserDialog = ({
                 Minimum 6 caractères. L'utilisateur pourra le modifier après connexion.
               </p>
             </div>
-          )}
 
-          {role !== 'client' && (
-            <div className="space-y-2">
+          <div className="space-y-2">
               <Label htmlFor="create-jobtitle">Fonction</Label>
               <Input
                 id="create-jobtitle"
@@ -260,7 +252,6 @@ export const CreateUserDialog = ({
                 maxLength={100}
               />
             </div>
-          )}
 
           <DialogFooter className="pt-4">
             <Button
