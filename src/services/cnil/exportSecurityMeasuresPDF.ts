@@ -2,10 +2,9 @@ import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import { Organisation, LegalFramework } from '@/types/rgpd';
+import { Organisation } from '@/types/rgpd';
 import { ProcessingRecord } from '@/types/documentation';
 import { supabase } from '@/integrations/supabase/client';
-import { getLegalFrameworkShortName } from '@/lib/legalReferences';
 
 const COLORS = {
   primary: [26, 54, 93] as [number, number, number],
@@ -38,16 +37,13 @@ const SECURITY_CATEGORIES = {
 };
 
 function addHeader(
-  doc: jsPDF, 
-  title: string, 
-  organisation: Organisation, 
-  legalFramework: LegalFramework
+  doc: jsPDF,
+  title: string,
+  organisation: Organisation
 ) {
   const pageWidth = doc.internal.pageSize.getWidth();
   const margin = 20;
-  const articleRef = legalFramework === 'loi_tunisie_2025' 
-    ? 'Article 40 du Projet de loi 2025/95' 
-    : 'Article 32 du RGPD';
+  const articleRef = 'Article 32 du RGPD';
 
   doc.setFillColor(...COLORS.primary);
   doc.rect(0, 0, pageWidth, 40, 'F');
@@ -106,14 +102,7 @@ export async function exportSecurityMeasuresPDF(
   const doc = new jsPDF();
   const pageWidth = doc.internal.pageSize.getWidth();
   const margin = 20;
-  const legalFramework: LegalFramework = organisation.legalFramework || 'rgpd_eu';
-  
-  let yPosition = addHeader(
-    doc, 
-    'MESURES DE SÉCURITÉ', 
-    organisation, 
-    legalFramework
-  );
+  let yPosition = addHeader(doc, 'MESURES DE SÉCURITÉ', organisation);
 
   // Récupérer les résultats d'audit pour la section sécurité
   const { data: auditResults } = await supabase
@@ -322,6 +311,5 @@ export async function exportSecurityMeasuresPDF(
 
   addFooter(doc);
   
-  const frameworkSuffix = legalFramework === 'loi_tunisie_2025' ? 'Tunisie' : 'RGPD';
-  doc.save(`Mesures_Securite_${frameworkSuffix}_${organisation.name.replace(/\s+/g, '_')}_${format(new Date(), 'yyyy-MM-dd')}.pdf`);
+  doc.save(`Mesures_Securite_RGPD_${organisation.name.replace(/\s+/g, '_')}_${format(new Date(), 'yyyy-MM-dd')}.pdf`);
 }
