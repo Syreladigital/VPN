@@ -65,7 +65,6 @@ const ACTION_LABELS: Record<string, string> = {
   'organisation_deleted': 'Suppression organisation',
   'login': 'Connexion',
   'view': 'Consultation',
-  'client_access_granted': 'Accès client accordé',
   'email_sent': 'Email envoyé',
 };
 
