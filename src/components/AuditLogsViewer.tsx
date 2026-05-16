@@ -62,7 +62,6 @@ const TABLE_LABELS: Record<string, string> = {
   corrective_actions: "Actions correctives",
   profiles: "Profils",
   user_roles: "Rôles utilisateurs",
-  client_access: "Accès clients",
 };
 
 const ACTION_CONFIG = {
@@ -81,7 +80,6 @@ const AUDITED_TABLES = [
   "corrective_actions",
   "profiles",
   "user_roles",
-  "client_access",
 ];
 
 export const AuditLogsViewer = () => {
