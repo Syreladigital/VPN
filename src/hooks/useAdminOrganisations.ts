@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import type { Organisation, Sector, OrganisationSize, DPORole, Country, LegalFramework } from '@/types/rgpd';
+import type { Organisation, Sector, OrganisationSize, DPORole } from '@/types/rgpd';
 
 export interface AdminOrganisation extends Organisation {
   user_id: string;
@@ -49,8 +49,6 @@ export const useAdminOrganisations = () => {
           sector: org.sector as Sector,
           size: org.size as OrganisationSize,
           dpoRole: org.dpo_role as DPORole,
-          country: org.country as Country,
-          legalFramework: org.legal_framework as LegalFramework,
           createdAt: new Date(org.created_at),
           user_id: org.user_id || '',
           ownerEmail: email?.email || '',
