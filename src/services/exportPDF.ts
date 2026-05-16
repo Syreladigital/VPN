@@ -1,16 +1,11 @@
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
-import { Organisation, SECTOR_LABELS, SIZE_LABELS, DPO_ROLE_LABELS, LegalFramework } from '@/types/rgpd';
+import { Organisation, SECTOR_LABELS, SIZE_LABELS, DPO_ROLE_LABELS } from '@/types/rgpd';
 import { AuditResultsData } from '@/hooks/useAuditResults';
 import { AuditAttemptAnswer } from '@/hooks/useAuditAttempts';
 import { supabase } from '@/integrations/supabase/client';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import { 
-  adaptLegalReference, 
-  getDataProtectionAuthority, 
-  getLegalFrameworkShortName,
-} from '@/lib/legalReferences';
 
 // Status labels for display
 const STATUS_LABELS: Record<string, string> = {
@@ -71,10 +66,8 @@ export async function exportToPDF(
   const margin = 20;
   let yPosition = 20;
   
-  // Déterminer le cadre juridique
-  const legalFramework: LegalFramework = organisation.legalFramework || 'rgpd_eu';
-  const frameworkName = getLegalFrameworkShortName(legalFramework);
-  const authorityName = getDataProtectionAuthority(legalFramework);
+  const frameworkName = 'RGPD';
+  const authorityName = 'CNIL';
 
   // Colors
   const primaryColor: [number, number, number] = [26, 54, 93]; // Marine blue
@@ -109,7 +102,7 @@ export async function exportToPDF(
   
   doc.setFontSize(12);
   doc.setFont('helvetica', 'normal');
-  doc.text(adaptLegalReference(`Conforme aux recommandations ${authorityName}`, legalFramework), margin, 35);
+  doc.text(`Conforme aux recommandations ${authorityName}`, margin, 35);
   
   doc.setFontSize(10);
   const auditDate = auditResults.completedAt 
@@ -461,8 +454,7 @@ export async function exportToPDF(
   }
 
   // Save with adapted filename
-  const frameworkSuffix = legalFramework === 'loi_tunisie_2025' ? 'Tunisie_2025' : 'RGPD';
-  const fileName = `Audit_${frameworkSuffix}_${organisation.name.replace(/\s+/g, '_')}_${format(new Date(), 'yyyy-MM-dd')}.pdf`;
+  const fileName = `Audit_RGPD_${organisation.name.replace(/\s+/g, '_')}_${format(new Date(), 'yyyy-MM-dd')}.pdf`;
   doc.save(fileName);
 }
 
