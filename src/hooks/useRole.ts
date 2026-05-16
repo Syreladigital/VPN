@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 
-export type AppRole = 'admin' | 'user' | 'super_admin' | 'client';
+export type AppRole = 'admin' | 'user' | 'super_admin';
 
 export interface UserRole {
   id: string;
@@ -17,7 +17,6 @@ export const useRole = () => {
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
   const [isSuperAdmin, setIsSuperAdmin] = useState(false);
-  const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
     // When auth state resolves, user may go from null -> defined.
@@ -28,7 +27,6 @@ export const useRole = () => {
       setRole(null);
       setIsAdmin(false);
       setIsSuperAdmin(false);
-      setIsClient(false);
       setLoading(false);
       return;
     }
@@ -47,13 +45,11 @@ export const useRole = () => {
         setRole(userRole);
         setIsSuperAdmin(userRole === 'super_admin');
         setIsAdmin(userRole === 'admin' || userRole === 'super_admin');
-        setIsClient(userRole === 'client');
       } catch (error) {
         console.error('Error fetching role:', error);
         setRole('user');
         setIsAdmin(false);
         setIsSuperAdmin(false);
-        setIsClient(false);
       } finally {
         setLoading(false);
       }
@@ -66,7 +62,6 @@ export const useRole = () => {
     role,
     isAdmin,
     isSuperAdmin,
-    isClient,
     loading,
   };
 };
