@@ -2,13 +2,8 @@ import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import { Organisation, LegalFramework, SECTOR_LABELS } from '@/types/rgpd';
+import { Organisation, SECTOR_LABELS } from '@/types/rgpd';
 import { ProcessingRecord } from '@/types/documentation';
-import { 
-  getLegalFrameworkShortName, 
-  getDataProtectionAuthority,
-  getLegalFrameworkFullName,
-} from '@/lib/legalReferences';
 
 const COLORS = {
   primary: [26, 54, 93] as [number, number, number],
@@ -17,14 +12,13 @@ const COLORS = {
 };
 
 function addHeader(
-  doc: jsPDF, 
-  title: string, 
-  organisation: Organisation, 
-  legalFramework: LegalFramework
+  doc: jsPDF,
+  title: string,
+  organisation: Organisation
 ) {
   const pageWidth = doc.internal.pageSize.getWidth();
   const margin = 20;
-  const frameworkName = getLegalFrameworkShortName(legalFramework);
+  const frameworkName = 'RGPD';
 
   doc.setFillColor(...COLORS.primary);
   doc.rect(0, 0, pageWidth, 40, 'F');
@@ -70,16 +64,10 @@ export async function exportPrivacyPolicyPDF(
   const doc = new jsPDF();
   const pageWidth = doc.internal.pageSize.getWidth();
   const margin = 20;
-  const legalFramework: LegalFramework = organisation.legalFramework || 'rgpd_eu';
-  const authority = getDataProtectionAuthority(legalFramework);
-  const frameworkFull = getLegalFrameworkFullName(legalFramework);
-  
-  let yPosition = addHeader(
-    doc, 
-    'POLITIQUE DE CONFIDENTIALITÉ', 
-    organisation, 
-    legalFramework
-  );
+  const authority = 'CNIL';
+  const frameworkFull = 'Règlement Général sur la Protection des Données (UE 2016/679)';
+
+  let yPosition = addHeader(doc, 'POLITIQUE DE CONFIDENTIALITÉ', organisation);
 
   // Introduction
   doc.setTextColor(...COLORS.primary);
@@ -218,23 +206,14 @@ export async function exportPrivacyPolicyPDF(
   doc.text('6. VOS DROITS', margin, yPosition);
   yPosition += 8;
   
-  const rights = legalFramework === 'loi_tunisie_2025' 
-    ? [
-        'Droit d\'accès à vos données personnelles (Art. 26)',
-        'Droit de rectification des données inexactes (Art. 27)',
-        'Droit à l\'effacement / "droit à l\'oubli" (Art. 28)',
-        'Droit à la limitation du traitement (Art. 30)',
-        'Droit à la portabilité des données (Art. 32)',
-        'Droit d\'opposition au traitement (Art. 33)',
-      ]
-    : [
-        'Droit d\'accès à vos données personnelles (Art. 15)',
-        'Droit de rectification des données inexactes (Art. 16)',
-        'Droit à l\'effacement / "droit à l\'oubli" (Art. 17)',
-        'Droit à la limitation du traitement (Art. 18)',
-        'Droit à la portabilité des données (Art. 20)',
-        'Droit d\'opposition au traitement (Art. 21)',
-      ];
+  const rights = [
+    'Droit d\'accès à vos données personnelles (Art. 15)',
+    'Droit de rectification des données inexactes (Art. 16)',
+    'Droit à l\'effacement / "droit à l\'oubli" (Art. 17)',
+    'Droit à la limitation du traitement (Art. 18)',
+    'Droit à la portabilité des données (Art. 20)',
+    'Droit d\'opposition au traitement (Art. 21)',
+  ];
   
   doc.setTextColor(...COLORS.gray);
   doc.setFontSize(9);
@@ -263,13 +242,11 @@ export async function exportPrivacyPolicyPDF(
   if (hasTransfers) {
     doc.text('Certains de nos traitements impliquent des transferts de données en dehors de', margin, yPosition);
     yPosition += 5;
-    const territory = legalFramework === 'loi_tunisie_2025' ? 'la Tunisie' : 'l\'Espace Économique Européen';
-    doc.text(`${territory}. Ces transferts sont encadrés par des garanties appropriées`, margin, yPosition);
+    doc.text(`l'Espace Économique Européen. Ces transferts sont encadrés par des garanties appropriées`, margin, yPosition);
     yPosition += 5;
     doc.text('(clauses contractuelles types, décision d\'adéquation, etc.).', margin, yPosition);
   } else {
-    const territory = legalFramework === 'loi_tunisie_2025' ? 'la Tunisie' : 'l\'Espace Économique Européen';
-    doc.text(`Vos données sont principalement traitées au sein de ${territory}.`, margin, yPosition);
+    doc.text(`Vos données sont principalement traitées au sein de l'Espace Économique Européen.`, margin, yPosition);
   }
   yPosition += 15;
 
@@ -315,6 +292,5 @@ export async function exportPrivacyPolicyPDF(
 
   addFooter(doc);
   
-  const frameworkSuffix = legalFramework === 'loi_tunisie_2025' ? 'Tunisie' : 'RGPD';
-  doc.save(`Politique_Confidentialite_${frameworkSuffix}_${organisation.name.replace(/\s+/g, '_')}_${format(new Date(), 'yyyy-MM-dd')}.pdf`);
+  doc.save(`Politique_Confidentialite_RGPD_${organisation.name.replace(/\s+/g, '_')}_${format(new Date(), 'yyyy-MM-dd')}.pdf`);
 }
