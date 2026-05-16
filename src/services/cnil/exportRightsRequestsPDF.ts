@@ -2,9 +2,8 @@ import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { format, differenceInDays } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import { Organisation, LegalFramework } from '@/types/rgpd';
+import { Organisation } from '@/types/rgpd';
 import { RightsRequest, RIGHT_TYPE_LABELS, REQUEST_STATUS_LABELS } from '@/types/documentation';
-import { getLegalFrameworkShortName } from '@/lib/legalReferences';
 
 const COLORS = {
   primary: [26, 54, 93] as [number, number, number],
@@ -16,16 +15,13 @@ const COLORS = {
 };
 
 function addHeader(
-  doc: jsPDF, 
-  title: string, 
-  organisation: Organisation, 
-  legalFramework: LegalFramework
+  doc: jsPDF,
+  title: string,
+  organisation: Organisation
 ) {
   const pageWidth = doc.internal.pageSize.getWidth();
   const margin = 20;
-  const articleRef = legalFramework === 'loi_tunisie_2025' 
-    ? 'Articles 26-35 du Projet de loi 2025/95' 
-    : 'Articles 15 à 22 du RGPD';
+  const articleRef = 'Articles 15 à 22 du RGPD';
 
   doc.setFillColor(...COLORS.primary);
   doc.rect(0, 0, pageWidth, 40, 'F');
@@ -71,14 +67,7 @@ export async function exportRightsRequestsPDF(
   const doc = new jsPDF();
   const pageWidth = doc.internal.pageSize.getWidth();
   const margin = 20;
-  const legalFramework: LegalFramework = organisation.legalFramework || 'rgpd_eu';
-  
-  let yPosition = addHeader(
-    doc, 
-    'REGISTRE DES DEMANDES DE DROITS', 
-    organisation, 
-    legalFramework
-  );
+  let yPosition = addHeader(doc, 'REGISTRE DES DEMANDES DE DROITS', organisation);
 
   // Statistiques par type de droit
   const statsByType: Record<string, number> = {};
@@ -227,6 +216,5 @@ export async function exportRightsRequestsPDF(
 
   addFooter(doc);
   
-  const frameworkSuffix = legalFramework === 'loi_tunisie_2025' ? 'Tunisie' : 'RGPD';
-  doc.save(`Registre_Droits_${frameworkSuffix}_${organisation.name.replace(/\s+/g, '_')}_${format(new Date(), 'yyyy-MM-dd')}.pdf`);
+  doc.save(`Registre_Droits_RGPD_${organisation.name.replace(/\s+/g, '_')}_${format(new Date(), 'yyyy-MM-dd')}.pdf`);
 }
