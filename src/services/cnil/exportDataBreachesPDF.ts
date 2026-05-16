@@ -2,12 +2,8 @@ import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import { Organisation, LegalFramework } from '@/types/rgpd';
+import { Organisation } from '@/types/rgpd';
 import { DataBreach, BREACH_STATUS_LABELS } from '@/types/documentation';
-import { 
-  getDataProtectionAuthority, 
-  getLegalFrameworkShortName 
-} from '@/lib/legalReferences';
 
 const COLORS = {
   primary: [26, 54, 93] as [number, number, number],
@@ -18,17 +14,14 @@ const COLORS = {
 };
 
 function addHeader(
-  doc: jsPDF, 
-  title: string, 
-  organisation: Organisation, 
-  legalFramework: LegalFramework
+  doc: jsPDF,
+  title: string,
+  organisation: Organisation
 ) {
   const pageWidth = doc.internal.pageSize.getWidth();
   const margin = 20;
-  const authority = getDataProtectionAuthority(legalFramework);
-  const articleRef = legalFramework === 'loi_tunisie_2025' 
-    ? 'Article 45 du Projet de loi 2025/95' 
-    : 'Article 33 du RGPD';
+  const authority = 'CNIL';
+  const articleRef = 'Article 33 du RGPD';
 
   doc.setFillColor(...COLORS.primary);
   doc.rect(0, 0, pageWidth, 40, 'F');
@@ -74,15 +67,9 @@ export async function exportDataBreachesPDF(
   const doc = new jsPDF();
   const pageWidth = doc.internal.pageSize.getWidth();
   const margin = 20;
-  const legalFramework: LegalFramework = organisation.legalFramework || 'rgpd_eu';
-  const authority = getDataProtectionAuthority(legalFramework);
-  
-  let yPosition = addHeader(
-    doc, 
-    'REGISTRE DES VIOLATIONS DE DONNÉES', 
-    organisation, 
-    legalFramework
-  );
+  const authority = 'CNIL';
+
+  let yPosition = addHeader(doc, 'REGISTRE DES VIOLATIONS DE DONNÉES', organisation);
 
   if (breaches.length === 0) {
     // Document attestant l'absence de violations
@@ -232,6 +219,5 @@ export async function exportDataBreachesPDF(
 
   addFooter(doc);
   
-  const frameworkSuffix = legalFramework === 'loi_tunisie_2025' ? 'Tunisie' : 'RGPD';
-  doc.save(`Registre_Violations_${frameworkSuffix}_${organisation.name.replace(/\s+/g, '_')}_${format(new Date(), 'yyyy-MM-dd')}.pdf`);
+  doc.save(`Registre_Violations_RGPD_${organisation.name.replace(/\s+/g, '_')}_${format(new Date(), 'yyyy-MM-dd')}.pdf`);
 }
