@@ -2,13 +2,8 @@ import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import { Organisation, LegalFramework } from '@/types/rgpd';
+import { Organisation } from '@/types/rgpd';
 import { ProcessingRecord, LEGAL_BASIS_OPTIONS } from '@/types/documentation';
-import { 
-  adaptLegalReference, 
-  getDataProtectionAuthority, 
-  getLegalFrameworkShortName 
-} from '@/lib/legalReferences';
 
 // Couleurs standardisées
 const COLORS = {
@@ -19,17 +14,13 @@ const COLORS = {
 };
 
 function addHeader(
-  doc: jsPDF, 
-  title: string, 
-  organisation: Organisation, 
-  legalFramework: LegalFramework
+  doc: jsPDF,
+  title: string,
+  organisation: Organisation
 ) {
   const pageWidth = doc.internal.pageSize.getWidth();
   const margin = 20;
-  const frameworkName = getLegalFrameworkShortName(legalFramework);
-  const articleRef = legalFramework === 'loi_tunisie_2025' 
-    ? 'Article 15 du Projet de loi 2025/95' 
-    : 'Article 30 du RGPD';
+  const articleRef = 'Article 30 du RGPD';
 
   // En-tête coloré
   doc.setFillColor(...COLORS.primary);
@@ -84,14 +75,8 @@ export async function exportProcessingRecordsPDF(
   const doc = new jsPDF();
   const pageWidth = doc.internal.pageSize.getWidth();
   const margin = 20;
-  const legalFramework: LegalFramework = organisation.legalFramework || 'rgpd_eu';
-  
-  let yPosition = addHeader(
-    doc, 
-    'REGISTRE DES TRAITEMENTS', 
-    organisation, 
-    legalFramework
-  );
+
+  let yPosition = addHeader(doc, 'REGISTRE DES TRAITEMENTS', organisation);
 
   // Résumé
   doc.setFillColor(248, 250, 252);
@@ -170,7 +155,7 @@ export async function exportProcessingRecordsPDF(
     didDrawPage: () => {
       // Réajouter l'en-tête sur chaque nouvelle page
       if ((doc as any).lastAutoTable.pageCount > 1) {
-        addHeader(doc, 'REGISTRE DES TRAITEMENTS (suite)', organisation, legalFramework);
+        addHeader(doc, 'REGISTRE DES TRAITEMENTS (suite)', organisation);
       }
     },
   });
@@ -209,6 +194,5 @@ export async function exportProcessingRecordsPDF(
 
   addFooter(doc);
   
-  const frameworkSuffix = legalFramework === 'loi_tunisie_2025' ? 'Tunisie' : 'RGPD';
-  doc.save(`Registre_Traitements_${frameworkSuffix}_${organisation.name.replace(/\s+/g, '_')}_${format(new Date(), 'yyyy-MM-dd')}.pdf`);
+  doc.save(`Registre_Traitements_RGPD_${organisation.name.replace(/\s+/g, '_')}_${format(new Date(), 'yyyy-MM-dd')}.pdf`);
 }
