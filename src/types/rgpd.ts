@@ -10,9 +10,9 @@ export type OrganisationSize = 'independant' | 'tpe' | 'pme' | 'groupe';
 
 export type DPORole = 'interne' | 'externe' | 'consultant';
 
-export type Country = 'france' | 'eu_other' | 'tunisie';
+export type Country = 'france' | 'eu_other';
 
-export type LegalFramework = 'rgpd_eu' | 'loi_tunisie_2025';
+export type LegalFramework = 'rgpd_eu';
 
 export type ConformityStatus = 'conforme' | 'partiellement_conforme' | 'non_conforme';
 
@@ -38,8 +38,6 @@ export interface Organisation {
   sector: Sector;
   size: OrganisationSize;
   dpoRole: DPORole;
-  country: Country;
-  legalFramework: LegalFramework;
   createdAt: Date;
 }
 
@@ -94,17 +92,6 @@ export const DPO_ROLE_LABELS: Record<DPORole, string> = {
   consultant: 'Consultant RGPD',
 };
 
-export const COUNTRY_LABELS: Record<Country, string> = {
-  france: 'France',
-  eu_other: 'Union européenne (autre)',
-  tunisie: 'Tunisie',
-};
-
-export const LEGAL_FRAMEWORK_LABELS: Record<LegalFramework, string> = {
-  rgpd_eu: 'RGPD (UE 2016/679)',
-  loi_tunisie_2025: 'Projet de loi n°2025/95 - Tunisie',
-};
-
 export const STATUS_LABELS: Record<ConformityStatus, string> = {
   conforme: 'Conforme',
   partiellement_conforme: 'Partiellement conforme',
@@ -124,7 +111,3 @@ export const RISK_LABELS: Record<RiskLevel, string> = {
   eleve: 'Élevé',
 };
 
-// Helper function to derive legal framework from country
-export function getLegalFrameworkFromCountry(country: Country): LegalFramework {
-  return country === 'tunisie' ? 'loi_tunisie_2025' : 'rgpd_eu';
-}
