@@ -7,7 +7,7 @@ import { AuditDashboard } from '@/components/AuditDashboard';
 import { useOrganisations } from '@/hooks/useOrganisations';
 import { useAuth } from '@/hooks/useAuth';
 import { useRole } from '@/hooks/useRole';
-import { LogOut, User, Loader2, Settings, ShieldCheck, FileText, UserPlus, Users } from 'lucide-react';
+import { LogOut, User, Loader2, Settings, ShieldCheck, FileText, UserPlus } from 'lucide-react';
 import syrelaLogo from '@/assets/syrela-trust-logo.png';
 import { Button } from '@/components/ui/button';
 import {
@@ -42,7 +42,7 @@ const Index = () => {
     navigate('/auth');
   };
 
-  const handleCreateOrganisation = async (org: Omit<Organisation, 'id' | 'createdAt'> & { clientEmail?: string }) => {
+  const handleCreateOrganisation = async (org: Omit<Organisation, 'id' | 'createdAt'>) => {
     const created = await createOrganisation(org);
     if (created) {
       setOrganisation(created);
@@ -115,12 +115,6 @@ const Index = () => {
                   <DropdownMenuItem onClick={() => navigate('/admin')}>
                     <ShieldCheck className="mr-2 h-4 w-4" />
                     Administration
-                  </DropdownMenuItem>
-                )}
-                {isAdmin && (
-                  <DropdownMenuItem onClick={() => navigate('/admin?tab=clients')}>
-                    <Users className="mr-2 h-4 w-4" />
-                    Clients
                   </DropdownMenuItem>
                 )}
                 {isSuperAdmin && (
