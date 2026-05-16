@@ -16,7 +16,7 @@ pool.on('error', (err) => {
  * Run a query inside a transaction with app.user_id set for RLS enforcement.
  * Use for any query that touches RLS-protected tables.
  */
-export async function queryWithUser<T = any>(
+export async function queryWithUser<T extends pg.QueryResultRow = any>(
   userId: string | null,
   text: string,
   values?: any[]
