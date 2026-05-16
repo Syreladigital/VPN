@@ -58,11 +58,8 @@ export const organisationFormSchema = z.object({
   size: z.enum(['independant', 'tpe', 'pme', 'groupe'], { 
     errorMap: () => ({ message: "La taille sélectionnée n'est pas valide" }) 
   }),
-  dpoRole: z.enum(['interne', 'externe', 'consultant'], { 
-    errorMap: () => ({ message: "Le rôle DPO sélectionné n'est pas valide" }) 
-  }),
-  country: z.enum(['france', 'eu_other', 'tunisie'], { 
-    errorMap: () => ({ message: "Le pays sélectionné n'est pas valide" }) 
+  dpoRole: z.enum(['interne', 'externe', 'consultant'], {
+    errorMap: () => ({ message: "Le rôle DPO sélectionné n'est pas valide" })
   }),
 });
 
