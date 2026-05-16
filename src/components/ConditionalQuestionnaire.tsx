@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ConditionalQuestion, QuestionnaireSection, QuestionAnswer } from '@/types/conditionalQuestionnaire';
 import { getQuestionnaireSectionsByFramework, getQuestionnaireLabel, TransportType } from '@/data/conditionalQuestions';
-import { Sector, SECTOR_LABELS, LegalFramework, LEGAL_FRAMEWORK_LABELS, TRANSPORT_TYPE_LABELS } from '@/types/rgpd';
+import { Sector, SECTOR_LABELS, TRANSPORT_TYPE_LABELS } from '@/types/rgpd';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -20,7 +20,6 @@ import { cn } from '@/lib/utils';
 import { simpleScore } from '@/lib/simpleScore';
 import { useAuditAttempts } from '@/hooks/useAuditAttempts';
 import { computeAuditResults, AuditResults } from '@/lib/computeAuditResults';
-import { adaptLegalReference, adaptQuestionLegalReferences } from '@/lib/legalReferences';
 import { 
   ChevronRight, 
   ChevronLeft, 
@@ -43,7 +42,6 @@ import {
 
 interface ConditionalQuestionnaireProps {
   sector: Sector;
-  legalFramework?: LegalFramework;
   organisationId?: string;
   organisationName?: string;
   onComplete?: (answers: QuestionAnswer[], results?: AuditResults) => void;
@@ -107,7 +105,6 @@ import { AuditCompletionDialog } from '@/components/AuditCompletionDialog';
 
 export function ConditionalQuestionnaire({
   sector,
-  legalFramework = 'rgpd_eu',
   organisationId,
   organisationName = '',
   onComplete,
@@ -121,9 +118,9 @@ export function ConditionalQuestionnaire({
   // État pour le type de transport (uniquement pour le secteur transport_logistique)
   const [transportType, setTransportType] = useState<TransportType>('general');
   
-  const sections = useMemo(() => 
-    getQuestionnaireSectionsByFramework(sector, legalFramework, sector === 'transport_logistique' ? transportType : undefined), 
-    [sector, legalFramework, transportType]
+  const sections = useMemo(() =>
+    getQuestionnaireSectionsByFramework(sector, sector === 'transport_logistique' ? transportType : undefined),
+    [sector, transportType]
   );
   const [currentSectionIndex, setCurrentSectionIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<string, QuestionAnswer>>(() => {
@@ -368,8 +365,7 @@ export function ConditionalQuestionnaire({
     const showGuidance = question.guidance && answer?.answer === false;
     const isAnswered = answer !== undefined;
     
-    // Adapter les références légales selon le cadre juridique
-    const adaptedQuestion = adaptQuestionLegalReferences(question, legalFramework);
+    const adaptedQuestion = question;
 
     return (
       <div
@@ -588,10 +584,10 @@ export function ConditionalQuestionnaire({
           <div className="flex items-center justify-between flex-wrap gap-2">
             <div>
               <CardTitle className="text-base">
-                {getQuestionnaireLabel(sector, legalFramework)}
+                {getQuestionnaireLabel(sector)}
               </CardTitle>
               <CardDescription className="text-sm">
-                {SECTOR_LABELS[sector]} • {LEGAL_FRAMEWORK_LABELS[legalFramework]}
+                {SECTOR_LABELS[sector]} • RGPD
               </CardDescription>
             </div>
             <div className="flex items-center gap-2 flex-wrap">
