@@ -83,26 +83,8 @@ export function ConformityScoreCard({ score, showDetails = true }: ConformitySco
   const config = conformityLevelConfig[score.conformityLevel];
   const Icon = config.icon;
 
-  const criticalFailures = score.criticalQuestionsTotal - score.criticalQuestionsPassed;
-  const hasCriticalFailure = criticalFailures > 0;
-
   return (
     <Card className="w-full">
-      {/* Alerte rouge indépendante du score global : un point critique non conforme suffit */}
-      {hasCriticalFailure && (
-        <div className="mx-6 mt-6 flex items-start gap-3 rounded-lg border border-red-400 bg-red-50 p-4 dark:bg-red-950/30">
-          <XCircle className="mt-0.5 h-5 w-5 shrink-0 text-red-600" />
-          <div>
-            <p className="text-sm font-semibold text-red-700">
-              {criticalFailures} point{criticalFailures > 1 ? 's' : ''} critique{criticalFailures > 1 ? 's' : ''} non conforme{criticalFailures > 1 ? 's' : ''}
-            </p>
-            <p className="mt-0.5 text-xs text-red-600">
-              Indépendamment du score global, ces points exigent une action immédiate.
-              Une non-conformité sur un point critique expose l'officine à un risque réglementaire fort (CNIL, CNOP).
-            </p>
-          </div>
-        </div>
-      )}
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -124,6 +106,7 @@ export function ConformityScoreCard({ score, showDetails = true }: ConformitySco
       </CardHeader>
       
       <CardContent className="space-y-6">
+        {/* Score global */}
         <div className="space-y-2">
           <div className="flex items-center justify-between">
             <span className="text-sm font-medium">Score global</span>
@@ -143,6 +126,7 @@ export function ConformityScoreCard({ score, showDetails = true }: ConformitySco
           </div>
         </div>
 
+        {/* Statistiques clés */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <div className="text-center p-3 rounded-lg bg-muted/50">
             <div className="text-2xl font-bold text-primary">
@@ -172,6 +156,7 @@ export function ConformityScoreCard({ score, showDetails = true }: ConformitySco
 
         {showDetails && (
           <>
+            {/* Scores par section */}
             <Accordion type="single" collapsible className="w-full">
               <AccordionItem value="sections">
                 <AccordionTrigger className="text-sm font-medium">
@@ -201,13 +186,17 @@ export function ConformityScoreCard({ score, showDetails = true }: ConformitySco
                             </span>
                           </div>
                         </div>
-                        <Progress value={section.percentage} className="h-2" />
+                        <Progress 
+                          value={section.percentage} 
+                          className="h-2"
+                        />
                       </div>
                     ))}
                   </div>
                 </AccordionContent>
               </AccordionItem>
 
+              {/* Recommandations prioritaires */}
               {score.priorityRecommendations.length > 0 && (
                 <AccordionItem value="recommendations">
                   <AccordionTrigger className="text-sm font-medium">
@@ -232,6 +221,7 @@ export function ConformityScoreCard({ score, showDetails = true }: ConformitySco
           </>
         )}
 
+        {/* Date de calcul */}
         <div className="text-xs text-muted-foreground text-right">
           Calculé le {score.calculatedAt.toLocaleDateString('fr-FR')} à {score.calculatedAt.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
         </div>
@@ -240,6 +230,7 @@ export function ConformityScoreCard({ score, showDetails = true }: ConformitySco
   );
 }
 
+// Version compacte pour affichage dans les listes
 export function ConformityScoreBadge({ score }: { score: ConformityScore }) {
   const config = conformityLevelConfig[score.conformityLevel];
   const Icon = config.icon;

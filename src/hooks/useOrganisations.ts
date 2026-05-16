@@ -31,6 +31,7 @@ export function useOrganisations() {
 
   const fetchOrganisations = useCallback(async () => {
     try {
+      // Get current user
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
         setOrganisations([]);
@@ -62,6 +63,7 @@ export function useOrganisations() {
     org: Omit<Organisation, 'id' | 'createdAt'> & { clientEmail?: string }
   ): Promise<Organisation | null> => {
     try {
+      // Get current user
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
         toast({
@@ -72,9 +74,28 @@ export function useOrganisations() {
         return null;
       }
 
+      // Extract clientEmail before inserting organisation
       const { clientEmail, ...orgData } = org;
 
+      // Debug: log values before insertion
+      console.log('=== DEBUG: Creating organisation ===');
+      console.log('name:', orgData.name, '| type:', typeof orgData.name);
+      console.log('sector:', orgData.sector, '| type:', typeof orgData.sector);
+      console.log('size:', orgData.size, '| type:', typeof orgData.size);
+      console.log('dpoRole:', orgData.dpoRole, '| type:', typeof orgData.dpoRole);
+      console.log('country:', orgData.country, '| type:', typeof orgData.country);
+      console.log('legalFramework:', orgData.legalFramework, '| type:', typeof orgData.legalFramework);
+
+      // Validate all required fields are present and non-empty
       if (!orgData.name?.trim() || !orgData.sector || !orgData.size || !orgData.dpoRole || !orgData.country || !orgData.legalFramework) {
+        console.error('Missing required fields:', { 
+          name: !!orgData.name?.trim(), 
+          sector: !!orgData.sector, 
+          size: !!orgData.size, 
+          dpoRole: !!orgData.dpoRole, 
+          country: !!orgData.country, 
+          legalFramework: !!orgData.legalFramework 
+        });
         toast({
           title: 'Erreur',
           description: 'Tous les champs obligatoires doivent être remplis correctement',
@@ -101,9 +122,11 @@ export function useOrganisations() {
 
       const newOrg = mapDbToOrganisation(data);
       setOrganisations(prev => [newOrg, ...prev]);
-
+      
+      // If clientEmail is provided, create client account and send welcome email
       if (clientEmail) {
         try {
+          // Create the client user via edge function (no password needed - uses reset link)
           const createUserResponse = await supabase.functions.invoke('create-user', {
             body: {
               email: clientEmail,
@@ -122,26 +145,25 @@ export function useOrganisations() {
           } else {
             const userId = createUserResponse.data?.userId || createUserResponse.data?.user?.id;
             const resetLink = createUserResponse.data?.resetLink;
-
+            
+            console.log('Client user created:', createUserResponse.data);
+            
+            // Grant client access to the organisation
             if (userId) {
               const { error: accessError } = await supabase.from('client_access').insert({
                 client_user_id: userId,
                 organisation_id: newOrg.id,
                 granted_by: user.id
               });
-
+              
               if (accessError) {
                 console.error('Error granting client access:', accessError);
-                toast({
-                  title: 'Avertissement',
-                  description: 'Organisation créée, mais l\'accès client n\'a pas pu être attribué. Veuillez contacter le support.',
-                  variant: 'destructive',
-                });
               }
             } else {
               console.error('No userId returned from create-user function');
             }
-
+            
+            // Send welcome email with reset link
             if (resetLink) {
               const emailResponse = await supabase.functions.invoke('send-client-welcome-email', {
                 body: {
@@ -198,6 +220,7 @@ export function useOrganisations() {
     }
   }, [toast]);
 
+  // Generate a secure random password
   const generateSecurePassword = (): string => {
     const length = 12;
     const charset = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%';
@@ -220,7 +243,7 @@ export function useOrganisations() {
       if (error) throw error;
 
       setOrganisations(prev => prev.filter(o => o.id !== id));
-
+      
       toast({
         title: 'Supprimé',
         description: 'L\'organisme a été supprimé'

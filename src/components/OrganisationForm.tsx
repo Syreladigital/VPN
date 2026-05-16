@@ -44,47 +44,90 @@ export function OrganisationForm({ onSubmit, onCancel }: OrganisationFormProps) 
   const { toast } = useToast();
 
   const legalFramework = country ? getLegalFrameworkFromCountry(country) : null;
-
+  
+  // Basic email validation
   const isValidEmail = (email: string) => {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
+    
+    // Validate all required fields are present and non-empty
     if (!name?.trim()) {
-      toast({ title: 'Erreur de validation', description: 'Le nom de l\'organisme est requis', variant: 'destructive' });
+      toast({
+        title: 'Erreur de validation',
+        description: 'Le nom de l\'organisme est requis',
+        variant: 'destructive',
+      });
       return;
     }
+
     if (!country) {
-      toast({ title: 'Erreur de validation', description: 'Veuillez sélectionner un pays', variant: 'destructive' });
+      toast({
+        title: 'Erreur de validation',
+        description: 'Veuillez sélectionner un pays',
+        variant: 'destructive',
+      });
       return;
     }
+
     if (!sector) {
-      toast({ title: 'Erreur de validation', description: 'Veuillez sélectionner un secteur d\'activité', variant: 'destructive' });
+      toast({
+        title: 'Erreur de validation',
+        description: 'Veuillez sélectionner un secteur d\'activité',
+        variant: 'destructive',
+      });
       return;
     }
+
     if (!size) {
-      toast({ title: 'Erreur de validation', description: 'Veuillez sélectionner la taille de la structure', variant: 'destructive' });
+      toast({
+        title: 'Erreur de validation',
+        description: 'Veuillez sélectionner la taille de la structure',
+        variant: 'destructive',
+      });
       return;
     }
+
     if (!dpoRole) {
-      toast({ title: 'Erreur de validation', description: 'Veuillez sélectionner le rôle du DPO', variant: 'destructive' });
+      toast({
+        title: 'Erreur de validation',
+        description: 'Veuillez sélectionner le rôle du DPO',
+        variant: 'destructive',
+      });
       return;
     }
-
-    const validationError = getFirstError(organisationFormSchema, { name: name.trim(), sector, size, dpoRole, country });
+    
+    const validationError = getFirstError(organisationFormSchema, {
+      name: name.trim(),
+      sector,
+      size,
+      dpoRole,
+      country,
+    });
+    
     if (validationError) {
-      toast({ title: 'Erreur de validation', description: validationError, variant: 'destructive' });
+      toast({
+        title: 'Erreur de validation',
+        description: validationError,
+        variant: 'destructive',
+      });
       return;
     }
 
+    // Validate client email if provided
     if (sendClientAccess && clientEmail && !isValidEmail(clientEmail)) {
-      toast({ title: 'Erreur de validation', description: 'L\'adresse email du client n\'est pas valide', variant: 'destructive' });
+      toast({
+        title: 'Erreur de validation',
+        description: 'L\'adresse email du client n\'est pas valide',
+        variant: 'destructive',
+      });
       return;
     }
 
     const derivedLegalFramework = getLegalFrameworkFromCountry(country);
+
     setIsSubmitting(true);
     try {
       await onSubmit({
@@ -128,6 +171,7 @@ export function OrganisationForm({ onSubmit, onCancel }: OrganisationFormProps) 
             />
           </div>
 
+          {/* Country selection - determines legal framework */}
           <div className="space-y-2">
             <Label htmlFor="country" className="flex items-center gap-2">
               <Globe className="h-4 w-4" />
@@ -138,24 +182,32 @@ export function OrganisationForm({ onSubmit, onCancel }: OrganisationFormProps) 
                 <SelectValue placeholder="Sélectionner le pays" />
               </SelectTrigger>
               <SelectContent>
-                {Object.entries(COUNTRY_LABELS)
-                  .filter(([value]) => value !== 'tunisie')
-                  .map(([value, label]) => (
-                    <SelectItem key={value} value={value}>{label}</SelectItem>
-                  ))}
+                {Object.entries(COUNTRY_LABELS).map(([value, label]) => (
+                  <SelectItem key={value} value={value}>
+                    {label}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>
 
+          {/* Legal framework info - automatically derived from country */}
           {legalFramework && (
-            <Alert className="border-blue-500 bg-blue-50">
+            <Alert className={legalFramework === 'loi_tunisie_2025' ? 'border-amber-500 bg-amber-50' : 'border-blue-500 bg-blue-50'}>
               <Scale className="h-4 w-4" />
               <AlertDescription className="ml-2">
                 <strong>Cadre juridique applicable :</strong>{' '}
                 {LEGAL_FRAMEWORK_LABELS[legalFramework]}
-                <p className="mt-1 text-sm text-muted-foreground">
-                  L'audit sera basé sur le Règlement (UE) 2016/679 (RGPD) et les référentiels CNIL.
-                </p>
+          {legalFramework === 'loi_tunisie_2025' && (
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    L'audit sera basé sur le Projet de loi organique n° 2025/95 relative à la protection des données personnelles et les exigences de l'INPDP.
+                  </p>
+                )}
+                {legalFramework === 'rgpd_eu' && (
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    L'audit sera basé sur le Règlement (UE) 2016/679 (RGPD) et les référentiels CNIL.
+                  </p>
+                )}
               </AlertDescription>
             </Alert>
           )}
@@ -168,7 +220,9 @@ export function OrganisationForm({ onSubmit, onCancel }: OrganisationFormProps) 
               </SelectTrigger>
               <SelectContent>
                 {Object.entries(SECTOR_LABELS).map(([value, label]) => (
-                  <SelectItem key={value} value={value}>{label}</SelectItem>
+                  <SelectItem key={value} value={value}>
+                    {label}
+                  </SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -178,27 +232,37 @@ export function OrganisationForm({ onSubmit, onCancel }: OrganisationFormProps) 
             <div className="space-y-2">
               <Label htmlFor="size">Taille de la structure *</Label>
               <Select value={size} onValueChange={(v) => setSize(v as OrganisationSize)}>
-                <SelectTrigger id="size"><SelectValue placeholder="Sélectionner" /></SelectTrigger>
+                <SelectTrigger id="size">
+                  <SelectValue placeholder="Sélectionner" />
+                </SelectTrigger>
                 <SelectContent>
                   {Object.entries(SIZE_LABELS).map(([value, label]) => (
-                    <SelectItem key={value} value={value}>{label}</SelectItem>
+                    <SelectItem key={value} value={value}>
+                      {label}
+                    </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </div>
+
             <div className="space-y-2">
               <Label htmlFor="dpoRole">Rôle du DPO *</Label>
               <Select value={dpoRole} onValueChange={(v) => setDpoRole(v as DPORole)}>
-                <SelectTrigger id="dpoRole"><SelectValue placeholder="Sélectionner" /></SelectTrigger>
+                <SelectTrigger id="dpoRole">
+                  <SelectValue placeholder="Sélectionner" />
+                </SelectTrigger>
                 <SelectContent>
                   {Object.entries(DPO_ROLE_LABELS).map(([value, label]) => (
-                    <SelectItem key={value} value={value}>{label}</SelectItem>
+                    <SelectItem key={value} value={value}>
+                      {label}
+                    </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </div>
           </div>
 
+          {/* Client Email Section */}
           <div className="space-y-4 rounded-lg border border-dashed border-primary/30 bg-primary/5 p-4">
             <div className="flex items-center space-x-2">
               <Checkbox
@@ -207,11 +271,15 @@ export function OrganisationForm({ onSubmit, onCancel }: OrganisationFormProps) 
                 onCheckedChange={(checked) => setSendClientAccess(checked === true)}
                 disabled={isSubmitting}
               />
-              <Label htmlFor="sendClientAccess" className="flex items-center gap-2 cursor-pointer text-sm font-medium">
+              <Label 
+                htmlFor="sendClientAccess" 
+                className="flex items-center gap-2 cursor-pointer text-sm font-medium"
+              >
                 <Mail className="h-4 w-4 text-primary" />
                 Créer un accès client et envoyer les identifiants par email
               </Label>
             </div>
+            
             {sendClientAccess && (
               <div className="space-y-2 pl-6">
                 <Label htmlFor="clientEmail">Email du client</Label>
@@ -239,9 +307,15 @@ export function OrganisationForm({ onSubmit, onCancel }: OrganisationFormProps) 
             )}
             <Button type="submit" className="flex-1" size="lg" disabled={!isValid || isSubmitting}>
               {isSubmitting ? (
-                <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Création en cours...</>
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Création en cours...
+                </>
               ) : (
-                <>Démarrer l'audit<ArrowRight className="ml-2 h-4 w-4" /></>
+                <>
+                  Démarrer l'audit
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </>
               )}
             </Button>
           </div>

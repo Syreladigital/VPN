@@ -63,7 +63,33 @@ const BASE_AUDIT_COMMANDS_RGPD: CommandItem[] = [
   },
 ];
 
-// Note: le module Tunisie (loi 2025/95) est hors scope du build FR.
+// Commandes de base pour l'audit - Projet de Loi Tunisie 2025/95
+const BASE_AUDIT_COMMANDS_TUNISIE: CommandItem[] = [
+  {
+    icon: FileText,
+    label: "Générer un audit complet",
+    command: "Génère un audit complet de conformité au Projet de loi 2025/95 pour mon organisme avec tous les registres obligatoires (registre des traitements, violations, demandes de droits, sous-traitants) et une analyse de risques adaptée à mon secteur. Cite les articles du projet de loi tunisien applicables.",
+    color: "text-blue-600",
+    bgColor: "bg-blue-50 hover:bg-blue-100 border-blue-200",
+    documentType: "Audit Projet de loi 2025/95",
+  },
+  {
+    icon: AlertTriangle,
+    label: "Plan d'actions prioritaires",
+    command: "Génère un plan d'actions priorisé pour améliorer ma conformité au Projet de loi 2025/95 tunisien. Mentionne les articles concernés et les exigences de l'INPDP.",
+    color: "text-orange-600",
+    bgColor: "bg-orange-50 hover:bg-orange-100 border-orange-200",
+    documentType: "Plan Actions Projet de loi 2025/95",
+  },
+  {
+    icon: Shield,
+    label: "Autorisation INPDP",
+    command: "Aide-moi à préparer une demande d'autorisation auprès de l'INPDP pour le traitement de données sensibles ou de santé (Articles 41 et 70 du Projet de loi 2025/95).",
+    color: "text-purple-600",
+    bgColor: "bg-purple-50 hover:bg-purple-100 border-purple-200",
+    documentType: "Demande Autorisation INPDP",
+  },
+];
 
 // Commandes spécifiques par secteur pour l'audit
 const SECTOR_AUDIT_COMMANDS: Record<string, CommandItem[]> = {
@@ -198,12 +224,28 @@ const DEFAULT_SECTOR_COMMANDS: CommandItem[] = [
 ];
 
 // Fonction pour obtenir les commandes d'audit personnalisées
-const getAuditCommands = (sector?: string, _legalFramework?: string): CommandItem[] => {
-  const sectorCommands = sector && SECTOR_AUDIT_COMMANDS[sector]
-    ? SECTOR_AUDIT_COMMANDS[sector]
+const getAuditCommands = (sector?: string, legalFramework?: string): CommandItem[] => {
+  const isTunisia = legalFramework === 'loi_tunisie_2025';
+  const baseCommands = isTunisia ? BASE_AUDIT_COMMANDS_TUNISIE : BASE_AUDIT_COMMANDS_RGPD;
+  
+  const sectorCommands = sector && SECTOR_AUDIT_COMMANDS[sector] 
+    ? SECTOR_AUDIT_COMMANDS[sector] 
     : DEFAULT_SECTOR_COMMANDS;
-
-  return [...BASE_AUDIT_COMMANDS_RGPD.slice(0, 1), ...sectorCommands, ...BASE_AUDIT_COMMANDS_RGPD.slice(1)];
+  
+  // Pour la Tunisie, adapter les commandes sectorielles
+  if (isTunisia) {
+    const adaptedSectorCommands = sectorCommands.map(cmd => ({
+      ...cmd,
+      command: cmd.command
+        .replace(/CNIL/g, 'INPDP')
+        .replace(/RGPD/g, 'Projet de loi 2025/95')
+        .replace(/Article 30/g, 'Projet de loi 2025/95')
+        .replace(/Article 28/g, 'Projet de loi 2025/95')
+    }));
+    return [...baseCommands.slice(0, 2), ...adaptedSectorCommands, ...baseCommands.slice(2)];
+  }
+  
+  return [...baseCommands.slice(0, 1), ...sectorCommands, ...baseCommands.slice(1)];
 };
 
 // Commandes de base pour la documentation
@@ -359,11 +401,25 @@ const DEFAULT_DOC_COMMANDS: CommandItem[] = [
 ];
 
 // Fonction pour obtenir les commandes de documentation personnalisées
-const getDocumentationCommands = (sector?: string, _legalFramework?: string): CommandItem[] => {
-  const sectorCommands = sector && SECTOR_DOC_COMMANDS[sector]
-    ? SECTOR_DOC_COMMANDS[sector]
+const getDocumentationCommands = (sector?: string, legalFramework?: string): CommandItem[] => {
+  const isTunisia = legalFramework === 'loi_tunisie_2025';
+  const sectorCommands = sector && SECTOR_DOC_COMMANDS[sector] 
+    ? SECTOR_DOC_COMMANDS[sector] 
     : DEFAULT_DOC_COMMANDS;
-
+  
+  // Pour la Tunisie, adapter les références légales
+  if (isTunisia) {
+    const adaptedCommands = [...sectorCommands, ...BASE_DOCUMENTATION_COMMANDS].map(cmd => ({
+      ...cmd,
+      command: cmd.command
+        .replace(/CNIL/g, 'INPDP')
+        .replace(/Article 33/g, 'Projet de loi 2025/95')
+        .replace(/Article 28/g, 'Projet de loi 2025/95')
+        .replace(/Article 30/g, 'Projet de loi 2025/95')
+    }));
+    return adaptedCommands;
+  }
+  
   return [...sectorCommands, ...BASE_DOCUMENTATION_COMMANDS];
 };
 

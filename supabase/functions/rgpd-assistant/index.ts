@@ -7,6 +7,7 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+// Input validation schemas
 const messageSchema = z.object({
   role: z.enum(['user', 'assistant', 'system']),
   content: z.string().min(1).max(5000)
@@ -26,10 +27,8 @@ const requestSchema = z.object({
   context: contextSchema
 });
 
-const SYSTEM_PROMPT = `Tu es SyrelaTrust, l'assistant IA de la plateforme SyrelaTrust by Syrela Digital.
-Tu es spécialisé en conformité RGPD (Règlement (UE) 2016/679) pour les professionnels de santé et les organismes français soumis au droit européen.
-Tu réponds exclusivement dans le cadre du droit européen (RGPD) et des référentiels CNIL. Tu ne traites pas les demandes relevant d'une législation étrangère (Tunisie, Maroc, etc.) — si on te le demande, redirige poliment vers un expert local.
-Si aucun secteur n'est précisé, applique par défaut les spécificités de l'officine pharmaceutique française.
+// Define the system prompt
+const SYSTEM_PROMPT = `Tu es SyrelaTrust, un assistant expert en conformité RGPD (Règlement Général sur la Protection des Données) spécialisé dans la génération d'audits sectoriels complets.
 
 ## TES CAPACITÉS PRINCIPALES
 
@@ -108,6 +107,11 @@ Générer automatiquement une checklist adaptée au secteur :
 - Durées légales dossier patient
 - Sécurité stricte + messagerie MSSanté
 - Vidéosurveillance : zones non accessibles aux patients interdites
+
+### Santé non réglementée – Bien-être (Naturopathe, Sophrologue)
+- Pas de données médicales "diagnostics" mais données sensibles possibles
+- Absence d'ordre → responsabilité renforcée sur transparence, durée de conservation, acceptation explicite
+- Sous-traitants souvent externes (plateformes, paiement, réservation)
 
 ### Assurance vie
 - Données financières + données fortement sensibles (bénéficiaires, sinistres, patrimoine)
@@ -191,9 +195,7 @@ Tu ne dois jamais :
 - Fournir de conseils juridiques définitifs (recommander de consulter un avocat si nécessaire)
 - Ignorer les spécificités sectorielles mentionnées
 - Sous-estimer les risques de non-conformité
-- Générer des données pour un autre organisme que celui sélectionné
-- Référencer une législation non européenne (loi tunisienne, marocaine, etc.) comme base applicable
-- Répondre à des demandes hors scope RGPD EU (ex: conseil fiscal, médical, juridique général)`;
+- Générer des données pour un autre organisme que celui sélectionné`;
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -201,6 +203,7 @@ serve(async (req) => {
   }
 
   try {
+    // Authentication check
     const authHeader = req.headers.get('Authorization');
     if (!authHeader?.startsWith('Bearer ')) {
       return new Response(JSON.stringify({ error: 'Non autorisé' }), {
@@ -224,6 +227,7 @@ serve(async (req) => {
       });
     }
 
+    // Parse and validate request body
     let requestBody;
     try {
       requestBody = await req.json();
@@ -235,10 +239,11 @@ serve(async (req) => {
       });
     }
 
+    // Validate request schema
     const validationResult = requestSchema.safeParse(requestBody);
     if (!validationResult.success) {
       console.error("Request validation failed:", validationResult.error.issues);
-      return new Response(JSON.stringify({
+      return new Response(JSON.stringify({ 
         error: "Données de requête invalides",
         details: validationResult.error.issues.map(i => i.message).join(", ")
       }), {
@@ -249,11 +254,12 @@ serve(async (req) => {
 
     const { messages, context } = validationResult.data;
     const MISTRAL_API_KEY = Deno.env.get("MISTRAL_API_KEY");
-
+    
     if (!MISTRAL_API_KEY) {
       throw new Error("MISTRAL_API_KEY is not configured");
     }
 
+    // Build context-aware system message
     let systemMessage = SYSTEM_PROMPT;
     if (context) {
       const sectorLabels: Record<string, string> = {
@@ -300,7 +306,10 @@ serve(async (req) => {
       },
       body: JSON.stringify({
         model: "mistral-large-latest",
-        messages: [{ role: "system", content: systemMessage }, ...messages],
+        messages: [
+          { role: "system", content: systemMessage },
+          ...messages,
+        ],
         stream: true,
       }),
     });
@@ -308,18 +317,21 @@ serve(async (req) => {
     if (!response.ok) {
       if (response.status === 429) {
         return new Response(JSON.stringify({ error: "Limite de requêtes atteinte, veuillez réessayer plus tard." }), {
-          status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" },
+          status: 429,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
       if (response.status === 402) {
         return new Response(JSON.stringify({ error: "Crédits insuffisants, veuillez contacter l'administrateur." }), {
-          status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" },
+          status: 402,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
       const errorText = await response.text();
       console.error("AI gateway error:", response.status, errorText);
       return new Response(JSON.stringify({ error: "Erreur du service IA" }), {
-        status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 500,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
@@ -329,7 +341,8 @@ serve(async (req) => {
   } catch (error) {
     console.error("rgpd-assistant error:", error);
     return new Response(JSON.stringify({ error: "Erreur interne du service" }), {
-      status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      status: 500,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }
 });
