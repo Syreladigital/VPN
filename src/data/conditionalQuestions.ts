@@ -1,15 +1,5 @@
 import { ConditionalQuestion, QuestionnaireSection, SectorQuestionnaire } from '@/types/conditionalQuestionnaire';
-import { Sector, LegalFramework } from '@/types/rgpd';
-import { 
-  tunisianCommonSections, 
-  tunisianHealthSections,
-  tunisianTransportGeneralSections,
-  tunisianTransportCustomsSections,
-  tunisianTransportMultimodalSections,
-  tunisianLifeInsuranceSections,
-  tunisianNonLifeInsuranceSections,
-  TUNISIAN_QUESTIONNAIRE_LABELS 
-} from './tunisianQuestions';
+import { Sector } from '@/types/rgpd';
 
 // ========================================
 // Questions critiques communes à tous les secteurs
@@ -8159,11 +8149,8 @@ export const SECTOR_QUESTIONNAIRE_LABELS: Record<Sector, string> = {
   transport_logistique: 'Questionnaire RGPD - Transport & Logistique'
 };
 
-// Fonction pour obtenir le label du questionnaire selon le cadre juridique
-export function getQuestionnaireLabel(sector: Sector, legalFramework: LegalFramework = 'rgpd_eu'): string {
-  if (legalFramework === 'loi_tunisie_2025') {
-    return TUNISIAN_QUESTIONNAIRE_LABELS[sector] || `Questionnaire Projet de loi 2025/95 - ${sector}`;
-  }
+// Fonction pour obtenir le label du questionnaire
+export function getQuestionnaireLabel(sector: Sector): string {
   return SECTOR_QUESTIONNAIRE_LABELS[sector];
 }
 
@@ -8220,19 +8207,16 @@ export function getQuestionnaireSections(sector: Sector, transportType?: Transpo
   return sections;
 }
 
-// Nouvelle fonction qui prend en compte le cadre juridique et le type de transport
+// Alias kept for backward compatibility
 export function getQuestionnaireSectionsByFramework(
-  sector: Sector, 
-  legalFramework: LegalFramework = 'rgpd_eu',
+  sector: Sector,
   transportType?: TransportType
 ): QuestionnaireSection[] {
-  // Utiliser les mêmes questions pour France et Tunisie (base RGPD)
-  // Les deux pays partagent les mêmes questionnaires sectoriels
   return getQuestionnaireSections(sector, transportType);
 }
 
-export function getAllQuestionsFlat(sector: Sector, legalFramework: LegalFramework = 'rgpd_eu', transportType?: TransportType): ConditionalQuestion[] {
-  const sections = getQuestionnaireSectionsByFramework(sector, legalFramework, transportType);
+export function getAllQuestionsFlat(sector: Sector, transportType?: TransportType): ConditionalQuestion[] {
+  const sections = getQuestionnaireSectionsByFramework(sector, transportType);
   const allQuestions: ConditionalQuestion[] = [];
   
   const extractQuestions = (questions: ConditionalQuestion[]) => {
