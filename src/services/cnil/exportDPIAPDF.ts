@@ -2,10 +2,9 @@ import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import { Organisation, LegalFramework } from '@/types/rgpd';
+import { Organisation } from '@/types/rgpd';
 import { ProcessingRecord } from '@/types/documentation';
 import { supabase } from '@/integrations/supabase/client';
-import { getLegalFrameworkShortName, getDataProtectionAuthority } from '@/lib/legalReferences';
 
 const COLORS = {
   primary: [26, 54, 93] as [number, number, number],
@@ -17,16 +16,13 @@ const COLORS = {
 };
 
 function addHeader(
-  doc: jsPDF, 
-  title: string, 
-  organisation: Organisation, 
-  legalFramework: LegalFramework
+  doc: jsPDF,
+  title: string,
+  organisation: Organisation
 ) {
   const pageWidth = doc.internal.pageSize.getWidth();
   const margin = 20;
-  const articleRef = legalFramework === 'loi_tunisie_2025' 
-    ? 'Article 48 du Projet de loi 2025/95' 
-    : 'Article 35 du RGPD';
+  const articleRef = 'Article 35 du RGPD';
 
   doc.setFillColor(...COLORS.primary);
   doc.rect(0, 0, pageWidth, 40, 'F');
@@ -133,17 +129,11 @@ export async function exportDPIAPDF(
   const doc = new jsPDF();
   const pageWidth = doc.internal.pageSize.getWidth();
   const margin = 20;
-  const legalFramework: LegalFramework = organisation.legalFramework || 'rgpd_eu';
-  const authority = getDataProtectionAuthority(legalFramework);
-  
+  const authority = 'CNIL';
+
   const dpiaCheck = await checkDPIARequired(organisation.id, processingRecords);
-  
-  let yPosition = addHeader(
-    doc, 
-    "ANALYSE D'IMPACT (DPIA)", 
-    organisation, 
-    legalFramework
-  );
+
+  let yPosition = addHeader(doc, "ANALYSE D'IMPACT (DPIA)", organisation);
 
   if (!dpiaCheck.isRequired) {
     // Document attestant que la DPIA n'est pas requise
@@ -353,6 +343,5 @@ export async function exportDPIAPDF(
 
   addFooter(doc);
   
-  const frameworkSuffix = legalFramework === 'loi_tunisie_2025' ? 'Tunisie' : 'RGPD';
-  doc.save(`DPIA_${frameworkSuffix}_${organisation.name.replace(/\s+/g, '_')}_${format(new Date(), 'yyyy-MM-dd')}.pdf`);
+  doc.save(`DPIA_RGPD_${organisation.name.replace(/\s+/g, '_')}_${format(new Date(), 'yyyy-MM-dd')}.pdf`);
 }
