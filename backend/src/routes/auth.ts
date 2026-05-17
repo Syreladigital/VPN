@@ -35,4 +35,34 @@ router.get('/auth/me', requireAuth, async (req, res) => {
   }
 });
 
+// Update current user's profile
+router.patch('/profile', requireAuth, async (req, res) => {
+  const { userId } = req as AuthenticatedRequest;
+  const { first_name, last_name, job_title } = req.body as {
+    first_name?: string;
+    last_name?: string;
+    job_title?: string;
+  };
+  try {
+    const result = await pool.query(
+      `UPDATE public.profiles
+       SET first_name = COALESCE($1, first_name),
+           last_name  = COALESCE($2, last_name),
+           job_title  = COALESCE($3, job_title),
+           updated_at = now()
+       WHERE user_id = $4
+       RETURNING *`,
+      [first_name, last_name, job_title, userId],
+    );
+    if (!result.rows[0]) {
+      res.status(404).json({ error: 'Profil introuvable' });
+      return;
+    }
+    res.json(result.rows[0]);
+  } catch (err) {
+    console.error('PATCH /profile error', err);
+    res.status(500).json({ error: 'Erreur serveur' });
+  }
+});
+
 export default router;

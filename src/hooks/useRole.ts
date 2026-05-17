@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { api } from '@/lib/api';
 import { useAuth } from './useAuth';
 
 export type AppRole = 'admin' | 'user' | 'super_admin';
@@ -19,8 +19,6 @@ export const useRole = () => {
   const [isSuperAdmin, setIsSuperAdmin] = useState(false);
 
   useEffect(() => {
-    // When auth state resolves, user may go from null -> defined.
-    // Ensure we re-enter a loading state to avoid premature redirects.
     setLoading(true);
 
     if (!user) {
@@ -31,37 +29,19 @@ export const useRole = () => {
       return;
     }
 
-    const fetchRole = async () => {
-      try {
-        const { data, error } = await supabase
-          .from('user_roles')
-          .select('role')
-          .eq('user_id', user.id)
-          .maybeSingle();
-
-        if (error) throw error;
-
-        const userRole = (data?.role as AppRole) || 'user';
-        setRole(userRole);
+    api.get<{ role: AppRole }>('/api/auth/me')
+      .then(({ role: userRole }) => {
+        setRole(userRole ?? 'user');
         setIsSuperAdmin(userRole === 'super_admin');
         setIsAdmin(userRole === 'admin' || userRole === 'super_admin');
-      } catch (error) {
-        console.error('Error fetching role:', error);
+      })
+      .catch(() => {
         setRole('user');
         setIsAdmin(false);
         setIsSuperAdmin(false);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchRole();
+      })
+      .finally(() => setLoading(false));
   }, [user]);
 
-  return {
-    role,
-    isAdmin,
-    isSuperAdmin,
-    loading,
-  };
+  return { role, isAdmin, isSuperAdmin, loading };
 };

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { User, Session } from '@supabase/supabase-js';
-import { supabase } from '@/integrations/supabase/client';
+import { authClient } from '@/lib/authClient';
+import { api } from '@/lib/api';
 
 export interface Profile {
   id: string;
@@ -10,92 +10,86 @@ export interface Profile {
   job_title: string | null;
 }
 
+interface AuthUser {
+  id: string;
+  email: string;
+  name?: string;
+}
+
 export const useAuth = () => {
-  const [user, setUser] = useState<User | null>(null);
-  const [session, setSession] = useState<Session | null>(null);
+  const [user, setUser] = useState<AuthUser | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Set up auth state listener FIRST
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        setSession(session);
-        setUser(session?.user ?? null);
-        
-        // Defer profile fetch with setTimeout to avoid deadlock
-        if (session?.user) {
-          setTimeout(() => {
-            fetchProfile(session.user.id);
-          }, 0);
-        } else {
-          setProfile(null);
-        }
-      }
-    );
+    let cancelled = false;
 
-    // THEN check for existing session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
+    authClient.getSession().then(({ data: session }) => {
+      if (cancelled) return;
       if (session?.user) {
-        fetchProfile(session.user.id);
+        setUser(session.user as AuthUser);
+        fetchProfile();
+      } else {
+        setUser(null);
+        setProfile(null);
       }
       setLoading(false);
     });
 
-    return () => subscription.unsubscribe();
+    return () => { cancelled = true; };
   }, []);
 
-  const fetchProfile = async (userId: string) => {
-    const { data, error } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('user_id', userId)
-      .single();
-
-    if (!error && data) {
-      setProfile(data);
+  const fetchProfile = async () => {
+    try {
+      const data = await api.get<{
+        first_name: string | null;
+        last_name: string | null;
+        job_title: string | null;
+        id: string;
+      }>('/api/auth/me');
+      setProfile({
+        id: data.id,
+        user_id: data.id,
+        first_name: data.first_name,
+        last_name: data.last_name,
+        job_title: data.job_title,
+      });
+    } catch {
+      setProfile(null);
     }
   };
 
   const signUp = async (
-    email: string, 
-    password: string, 
-    firstName: string, 
-    lastName: string
+    email: string,
+    password: string,
+    firstName: string,
+    lastName: string,
   ) => {
-    const redirectUrl = `${window.location.origin}/`;
-
-    const { data, error } = await supabase.auth.signUp({
+    const { data, error } = await authClient.signUp.email({
       email,
       password,
-      options: {
-        emailRedirectTo: redirectUrl,
-        data: {
-          first_name: firstName,
-          last_name: lastName,
-        },
-      },
+      name: `${firstName} ${lastName}`,
     });
-
+    if (!error && data?.user) {
+      setUser(data.user as AuthUser);
+      await fetchProfile();
+    }
     return { data, error };
   };
 
   const signIn = async (email: string, password: string) => {
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-
+    const { data, error } = await authClient.signIn.email({ email, password });
+    if (!error && data?.user) {
+      setUser(data.user as AuthUser);
+      await fetchProfile();
+    }
     return { data, error };
   };
 
   const signOut = async () => {
-    const { error } = await supabase.auth.signOut();
+    const { error } = await authClient.signOut();
     if (!error) {
       setUser(null);
-      setSession(null);
       setProfile(null);
     }
     return { error };
@@ -103,24 +97,18 @@ export const useAuth = () => {
 
   const updateProfile = async (updates: Partial<Omit<Profile, 'id' | 'user_id'>>) => {
     if (!user) return { error: new Error('Non authentifié') };
-
-    const { data, error } = await supabase
-      .from('profiles')
-      .update(updates)
-      .eq('user_id', user.id)
-      .select()
-      .single();
-
-    if (!error && data) {
+    try {
+      const data = await api.patch<Profile>('/api/profile', updates);
       setProfile(data);
+      return { data, error: null };
+    } catch (err) {
+      return { data: null, error: err as Error };
     }
-
-    return { data, error };
   };
 
   return {
     user,
-    session,
+    session: user ? { user } : null,
     profile,
     loading,
     signUp,
