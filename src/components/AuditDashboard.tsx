@@ -7,7 +7,6 @@ import { AuditModuleDetail } from './AuditModuleDetail';
 import { ModuleSectionDetail } from './ModuleSectionDetail';
 import { StatisticsDashboard } from './StatisticsDashboard';
 import { ModuleConformityDashboard } from './ModuleConformityDashboard';
-import { SendAuditEmailDialog } from './SendAuditEmailDialog';
 import { AuditAttemptsHistory } from './AuditAttemptsHistory';
 import { AIAssistant } from './AIAssistant';
 import { QuestionnaireTab } from './QuestionnaireTab';
@@ -139,7 +138,6 @@ export function AuditDashboard({ organisation, onBack, profile }: AuditDashboard
   const [exporting, setExporting] = useState<'pdf' | 'word' | 'insurance' | null>(null);
   const [activeTab, setActiveTab] = useState('questionnaire');
   const [restartTrigger, setRestartTrigger] = useState(0);
-  const [showSendEmailDialog, setShowSendEmailDialog] = useState(false);
   
   const baseModules = getBaseModulesForSector(organisation.sector);
   const { history, saving, saveSnapshot, loading, saveAuditItem, loadModuleItems } = useAuditPersistence(organisation);
@@ -560,7 +558,7 @@ export function AuditDashboard({ organisation, onBack, profile }: AuditDashboard
                 isLoading={resultsLoading}
                 onStartAudit={handleStartAudit}
                 onRestartAudit={handleRestartAudit}
-                onSendToClient={auditResults?.hasCompletedAudit ? () => setShowSendEmailDialog(true) : undefined}
+                onSendToClient={undefined}
               />
             </TabsContent>
 
@@ -705,16 +703,6 @@ export function AuditDashboard({ organisation, onBack, profile }: AuditDashboard
         organisationId={organisation.id}
       />
 
-      {/* Send Audit Email Dialog */}
-      {auditResults && (
-        <SendAuditEmailDialog
-          open={showSendEmailDialog}
-          onOpenChange={setShowSendEmailDialog}
-          organisationId={organisation.id}
-          organisationName={organisation.name}
-          auditResults={auditResults}
-        />
-      )}
     </div>
   );
 }
